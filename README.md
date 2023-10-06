@@ -1,4 +1,4 @@
-# Welcome to 'vidbg' 
+## Welcome to 'vidbg' 
 This repo holds the content for a landing page using a full screen video background. 
 
 ## Features
