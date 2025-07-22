@@ -421,6 +421,11 @@
         // Display the random quote
         document.getElementById('quote-text').innerText = getRandomQuote();
 
+        // New quote every 5 seconds
+        setInterval(() => {
+            document.getElementById('quote-text').innerText = getRandomQuote();
+        }, 5000);
+
         // Navigation functionality
         function showPage(pageId) {
             // Hide all pages
