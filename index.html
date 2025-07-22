@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OR - Digital Gold Mining</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #2a2a2a 100%);
+            overflow: hidden;
+            height: 100vh;
+            font-family: 'Arial', sans-serif;
+            position: relative;
+        }
+
+        .container {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .hash-number {
+            position: absolute;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            color: #ffd700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            font-size: 14px;
+            opacity: 0.8;
+            z-index: 1;
+        }
+
+        .golden-hash {
+            color: #ffd700 !important;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 40px rgba(255, 215, 0, 0.4);
+            font-size: 18px !important;
+            opacity: .6 !important;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 40px rgba(255, 215, 0, 0.4);
+            }
+            to {
+                text-shadow: 0 0 30px rgba(255, 215, 0, 1), 0 0 60px rgba(255, 215, 0, 0.6);
+            }
+        }
+
+        .text-container {
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 1.5s ease-out;
+            z-index: 10;
+            position: relative;
+            text-align: center;
+        }
+
+        .text-container.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .main-text {
+            font-family: 'Arial', sans-serif;
+            font-size: 4rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #ffed4e, #ffd700, #ffb300);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 60px rgba(194, 194, 194, 0.307);
+            margin-bottom: 10px;
+            filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.4));
+        }
+
+        .sub-text {
+            font-family: 'Arial', sans-serif;
+            font-size: 1.5rem;
+            font-weight: normal;
+            color: #ff0000;
+        }
+
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            border-radius: 50%;
+            opacity: 0;
+            animation: sparkle 3s linear infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+
+        .golden-numbers-container {
+            position: absolute;
+            display: flex;
+            gap: 80px;
+            z-index: 5;
+            opacity: 0;
+            transition: opacity 1s ease-in-out 6s;
+        }
+
+        .golden-numbers-container.show {
+            opacity: .2;
+        }
+
+        .sifting-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.8), transparent);
+            top: 52%;
+            transform: translateY(-52%);
+            opacity: 0;
+            animation: siftingEffect 2s ease-in-out 3s forwards;
+            z-index: 3;
+        }
+
+        @keyframes siftingEffect {
+            0% { opacity: 0; transform: translateY(-50%) scaleX(0); }
+            50% { opacity: 1; transform: translateY(-50%) scaleX(1); }
+            100% { opacity: 0; transform: translateY(-50%) scaleX(1); }
+        }
+
+        .fade-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent 0%, transparent 45%, rgba(10, 10, 10, 0.9) 55%, rgba(10, 10, 10, 1) 100%);
+            z-index: 4;
+            opacity: 0;
+            animation: fadeIn 1s ease-in-out 4s forwards;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="particles" id="particles"></div>
+        <div class="sifting-line"></div>
+        <div class="fade-overlay"></div>
+        
+        <div class="text-container" id="textContainer">
+            <div class="main-text">Trommel<span class="sub-text"> by Axsym</span></div>
+        </div>
+
+        <div class="golden-numbers-container" id="goldenNumbers"></div>
+    </div>
+
+    <script>
+        const hashExamples = [
+            "a3f7b2c8d4e1",
+            "7e9f1a2b5c8d",
+            "c4d8e2f6a9b3",
+            "9b5f3e7a1d4c",
+            "f2a6b9c3d7e1",
+            "6e1c4f8a2b5d",
+            "d7b3f9e2a6c4",
+            "5a9d2f6b4e8c",
+            "8c3f7a9b2d5e",
+            "b6e4a8c1f3d9",
+            "1d9f5b3c7a2e",
+            "4f7c9a5e8b1d",
+            "e2b6d4f9c3a8",
+            "3c8f2d6a9b5e",
+            "9a4e7c2f6b8d",
+            "f6d3a9c5e2b7",
+            "2e8c4f7a3d9b",
+            "7b9f6e2a4c8d",
+            "c1a5f9b7e3d6",
+            "5f2d8c6a9b4e"
+        ];
+
+        function generateHashNumbers() {
+            const container = document.querySelector('.container');
+            
+            // Create multiple clusters of falling numbers
+            for (let cluster = 0; cluster < 5; cluster++) {
+                setTimeout(() => {
+                    for (let i = 0; i < 15; i++) {
+                        setTimeout(() => {
+                            const hashElement = document.createElement('div');
+                            hashElement.className = 'hash-number';
+                            hashElement.textContent = hashExamples[Math.floor(Math.random() * hashExamples.length)];
+                            
+                            // Random starting position across the width
+                            const startX = Math.random() * window.innerWidth;
+                            hashElement.style.left = startX + 'px';
+                            hashElement.style.top = '-50px';
+                            
+                            container.appendChild(hashElement);
+                            
+                            // Animate falling
+                            animateHash(hashElement, startX);
+                        }, i * 100);
+                    }
+                }, cluster * 300);
+            }
+        }
+
+        function animateHash(element, startX) {
+            let currentY = -50;
+            const fallSpeed = 2 + Math.random() * 3;
+            const sway = (Math.random() - 0.5) * 0.5;
+            let currentX = startX;
+            
+            const fall = () => {
+                currentY += fallSpeed;
+                currentX += sway;
+                
+                element.style.top = currentY + 'px';
+                element.style.left = currentX + 'px';
+                
+                // Check if it's at the midpoint (sifting line)
+                if (currentY >= window.innerHeight * 0.5 && currentY <= window.innerHeight * 0.5 + 50) {
+                    // Most numbers continue falling, only a few stop
+                    if (Math.random() > 0.98) { // Very low chance to stop (golden nugget)
+                        selectAsGoldenHash(element, currentX);
+                        return;
+                    }
+                }
+                
+                // Continue falling if not selected
+                if (currentY < window.innerHeight + 100) {
+                    requestAnimationFrame(fall);
+                } else {
+                    element.remove();
+                }
+            };
+            
+            requestAnimationFrame(fall);
+        }
+
+        let selectedHashes = [];
+        
+        function selectAsGoldenHash(element, x) {
+            if (selectedHashes.length < 3) {
+                element.classList.add('golden-hash');
+                element.style.position = 'fixed';
+                element.style.top = window.innerHeight * 0.5 + 'px';
+                
+                selectedHashes.push(element);
+                
+                // Position them nicely around the center
+                if (selectedHashes.length === 3) {
+                    positionGoldenHashes();
+                }
+            } else {
+                // If we already have 3, this one continues falling
+                let currentY = parseFloat(element.style.top);
+                const continueFall = () => {
+                    currentY += 3;
+                    element.style.top = currentY + 'px';
+                    if (currentY < window.innerHeight + 100) {
+                        requestAnimationFrame(continueFall);
+                    } else {
+                        element.remove();
+                    }
+                };
+                requestAnimationFrame(continueFall);
+            }
+        }
+
+        function positionGoldenHashes() {
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            
+            selectedHashes.forEach((hash, index) => {
+                const angle = (index * 120 - 60) * Math.PI / 180; // 120 degrees apart, starting from left
+                const radius = 200;
+                const x = centerX + Math.cos(angle) * radius;
+                const y = centerY + Math.sin(angle) * 50;
+                
+                hash.style.left = x + 'px';
+                hash.style.top = y + 'px';
+                hash.style.transition = 'all 1s ease-out';
+            });
+            
+            // Show text after positioning
+            setTimeout(() => {
+                showText();
+                document.getElementById('goldenNumbers').classList.add('show');
+            }, 1500);
+        }
+
+        function showText() {
+            const textContainer = document.getElementById('textContainer');
+            textContainer.classList.add('show');
+        }
+
+        function createSparkleParticles() {
+            const particlesContainer = document.getElementById('particles');
+            
+            setInterval(() => {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * window.innerWidth + 'px';
+                particle.style.top = Math.random() * window.innerHeight + 'px';
+                particle.style.animationDelay = Math.random() * 3 + 's';
+                
+                particlesContainer.appendChild(particle);
+                
+                setTimeout(() => {
+                    particle.remove();
+                }, 3000);
+            }, 200);
+        }
+
+        // Start the animation sequence
+        window.addEventListener('load', () => {
+            generateHashNumbers();
+            createSparkleParticles();
+        });
+    </script>
+</body>
+</html>
