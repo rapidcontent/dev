@@ -1,628 +1,341 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Au - Applicant Unknown</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #2a2a2a 100%);
-            overflow: hidden;
-            height: 100vh;
-            font-family: 'Arial', sans-serif;
-            position: relative;
-        }
-
-        /* Navigation Styles */
-        .navbar {
-            position: fixed;
-            top: 20px;
-            right: 30px;
-            z-index: 100;
-            display: flex;
-            gap: 30px;
-            align-items: center;
-        }
-
-        .nav-link {
-            color: #ffd700;
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 16px;
-            padding: 10px 20px;
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            border-radius: 25px;
-            background: rgba(10, 10, 10, 0.7);
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .nav-link:hover {
-            background: rgba(255, 215, 0, 0.1);
-            border-color: rgba(255, 215, 0, 0.6);
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-            transform: translateY(-2px);
-        }
-
-        .nav-link.active {
-            background: rgba(255, 215, 0, 0.15);
-            border-color: #ffd700;
-        }
-
-        /* Pricing Table */
-
-        .pricing-table {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            flex-wrap: nowrap;
-        }
-        .pricing-tier {
-            background-color: #00000084;
-            opacity: 0.7;
-            padding: 1.5rem;
-            border-radius: 15px;
-            width: 250px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .pricing-tier h3 {
-            padding: 0.5rem 1rem;
-            margin-top: 0;
-            color: #ffd700;
-        }
-        .pricing-tier p {
-            padding: 0.5rem 1rem;
-            color: #ffd700;
-        }
-        .pricing-tier button {
-            background-color: #333;
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .pricing-tier button:hover {
-            background-color: #989797;
-        }
-
-        /* Page Container */
-        .page {
-            display: none;
-            width: 100%;
-            height: 100vh;
-            position: relative;
-        }
-
-        .page.active {
-            display: block;
-        }
-
-        .container {
-            width: 100%;
-            height: 100vh;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .hash-number {
-            position: absolute;
-            font-family: 'Courier New', monospace;
-            font-weight: bold;
-            color: #ffd700;
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-            font-size: 14px;
-            opacity: 0.8;
-            z-index: 1;
-        }
-
-        .golden-hash {
-            color: #ffd700 !important;
-            text-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 40px rgba(255, 215, 0, 0.4);
-            font-size: 18px !important;
-            opacity: .6 !important;
-            animation: glow 2s ease-in-out infinite alternate;
-        }
-
-        @keyframes glow {
-            from {
-                text-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 40px rgba(255, 215, 0, 0.4);
-            }
-            to {
-                text-shadow: 0 0 30px rgba(255, 215, 0, 1), 0 0 60px rgba(255, 215, 0, 0.6);
-            }
-        }
-
-        .text-container {
-            opacity: 0;
-            transform: scale(0.5);
-            transition: all 1.5s ease-out;
-            z-index: 10;
-            position: relative;
-            text-align: center;
-        }
-
-        .text-container.show {
-            opacity: 1;
-            transform: scale(1);
-        }
-
-        .main-text {
-            font-family: 'Arial', sans-serif;
-            font-size: 4rem;
-            font-weight: bold;
-            background: linear-gradient(135deg, #ffed4e, #ffd700, #ffb300);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-shadow: 0 0 60px rgba(194, 194, 194, 0.307);
-            margin-bottom: 10px;
-            filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.4));
-        }
-
-        .sub-text {
-            font-family: 'Arial', sans-serif;
-            font-size: 1.5rem;
-            font-weight: normal;
-            color: #ff0000;
-        }
-
-        .particles {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 2;
-        }
-
-        .particle {
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background: linear-gradient(45deg, #ffd700, #ffed4e);
-            border-radius: 50%;
-            opacity: 0;
-            animation: sparkle 3s linear infinite;
-        }
-
-        @keyframes sparkle {
-            0%, 100% { opacity: 0; transform: scale(0); }
-            50% { opacity: 1; transform: scale(1); }
-        }
-
-        .golden-numbers-container {
-            position: absolute;
-            display: flex;
-            gap: 80px;
-            z-index: 5;
-            opacity: 0;
-            transition: opacity 1s ease-in-out 6s;
-        }
-
-        .golden-numbers-container.show {
-            opacity: .2;
-        }
-
-        .sifting-line {
-            position: absolute;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.8), transparent);
-            top: 52%;
-            transform: translateY(-52%);
-            opacity: 0;
-            animation: siftingEffect 2s ease-in-out 3s forwards;
-            z-index: 3;
-        }
-
-        @keyframes siftingEffect {
-            0% { opacity: 0; transform: translateY(-50%) scaleX(0); }
-            50% { opacity: 1; transform: translateY(-50%) scaleX(1); }
-            100% { opacity: 0; transform: translateY(-50%) scaleX(1); }
-        }
-
-        .fade-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(to bottom, transparent 0%, transparent 45%, rgba(10, 10, 10, 0.9) 55%, rgba(10, 10, 10, 1) 100%);
-            z-index: 4;
-            opacity: 0;
-            animation: fadeIn 1s ease-in-out 4s forwards;
-        }
-
-        @keyframes fadeIn {
-            to { opacity: 1; }
-        }
-
-        /* Placeholder page styles */
-        .placeholder-content {
-            text-align: center;
-            z-index: 10;
-            position: relative;
-            max-width: 800px;
-            padding: 0 20px;
-        }
-
-        .page-title {
-            font-family: 'Arial', sans-serif;
-            font-size: 3rem;
-            font-weight: bold;
-            background: linear-gradient(135deg, #ffed4e, #ffd700, #ffb300);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 30px;
-            filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.4));
-        }
-
-        .page-description {
-            color: #ffd700;
-            font-size: 1.2rem;
-            line-height: 1.6;
-            opacity: 0.8;
-            margin-bottom: 40px;
-        }
-
-        .coming-soon {
-            color: #00c946;
-            font-size: 1rem;
-            font-style: italic;
-            padding: 15px 30px;
-            border: 1px solid rgba(102, 255, 117, 0.3);
-            border-radius: 25px;
-            background: rgba(102, 255, 158, 0.1);
-            display: inline-block;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TalentFlow - Hire Smarter, Hire Fair</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #1a1a1a;
+      color: #f5f5f5;
+    }
+    /* Navigation */
+    nav {
+  background-color: #1a1a1a;
+  padding: 1rem 2rem 1rem 1.5rem; /* Increased right padding to prevent cutoff */
+  position: fixed;
+  width: 100%;
+  box-sizing: border-box; /* Ensures padding doesn’t cause overflow */
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+@media (max-width: 768px) {
+  nav {
+    padding: 1rem 1rem; /* Reduced padding for smaller screens */
+  }
+  nav div:last-child {
+    margin-right: 0.5rem; /* Extra margin for nav-btn on small screens */
+  }
+}
+    nav a {
+      color: #d4af37;
+      text-decoration: none;
+      margin: 0 1rem;
+      font-size: 1.1rem;
+    }
+    nav a:hover {
+      color: #ffd700;
+    }
+    .nav-btn {
+      background-color: #d4af37;
+      color: #1a1a1a;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+    .nav-btn:hover {
+      background-color: #ffd700;
+    }
+    /* Slider */
+    .slider {
+      position: relative;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .slide {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      opacity: 0;
+      transition: opacity 1s ease-in-out;
+    }
+    .slide.active {
+      opacity: 1;
+    }
+    .slide-content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      color: #f5f5f5;
+      text-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+    }
+    .slide-content h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+    .slide-content p {
+      font-size: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .slide-content button {
+      background-color: #d4af37;
+      color: #1a1a1a;
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 5px;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+    .slide-content button:hover {
+      background-color: #ffd700;
+    }
+    /* Gold Flecks Animation */
+    .gold-flecks {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 5;
+    }
+    .fleck {
+      position: absolute;
+      width: 5px;
+      height: 5px;
+      background-color: #ffd700;
+      border-radius: 50%;
+      opacity: 0.3;
+      animation: sparkle 3s infinite;
+    }
+    @keyframes sparkle {
+      0% { transform: scale(0.5); opacity: 0.3; }
+      50% { transform: scale(1); opacity: 0.7; }
+      100% { transform: scale(0.5); opacity: 0.3; }
+    }
+    /* Sections */
+    section {
+      padding: 4rem 2rem;
+      text-align: center;
+    }
+    section h2 {
+      font-size: 2.5rem;
+      color: #d4af37;
+      margin-bottom: 2rem;
+    }
+    .features-grid, .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .feature-card, .pricing-card {
+      background-color: #2a2a2a;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+    .feature-card h3, .pricing-card h3 {
+      color: #d4af37;
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .pricing-card ul {
+      text-align: left;
+      margin-bottom: 1rem;
+    }
+    .pricing-card ul li {
+      margin-bottom: 0.5rem;
+    }
+    .pricing-card button {
+      background-color: #d4af37;
+      color: #1a1a1a;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .pricing-card button:hover {
+      background-color: #ffd700;
+    }
+    /* Footer */
+    footer {
+      background-color: #1a1a1a;
+      padding: 1rem;
+      text-align: center;
+      color: #d4af37;
+    }
+  </style>
 </head>
 <body>
-    <!-- Navigation Bar -->
-    <nav class="navbar">
-        <a href="#" class="nav-link active" onclick="showPage('home')">Home</a>
-        <a href="#" class="nav-link" onclick="showPage('discover')">Discover</a>
-        <a href="#" class="nav-link" onclick="showPage('pricing')">Pricing</a>
-        <a href="#" class="nav-link" onclick="showPage('login')">Login</a>
-    </nav>
-
-    <!-- Home Page -->
-    <div class="page active" id="home">
-        <div class="container">
-            <div class="particles" id="particles"></div>
-            <div class="sifting-line"></div>
-            <div class="fade-overlay"></div>
-            
-            <div class="text-container" id="textContainer">
-                <div class="main-text">Au<span class="sub-text"> by Axsym</span></div>
-            </div>
-
-            <div class="golden-numbers-container" id="goldenNumbers"></div>
-        </div>
+  <!-- Navigation -->
+  <nav>
+    <div>
+      <a href="#" style="font-size: 1.5rem; font-weight: bold;">TalentFlow</a>
     </div>
-
-    <!-- Discover Page -->
-    <div class="page" id="discover">
-        <div class="container">
-            <div class="particles"></div>
-            <div class="placeholder-content">
-                <h1 class="page-title">Discover</h1>
-                <p class="page-description">
-                    Au by Axsym embodies the essence of excellence and value, drawing inspiration from the element for gold, 
-                    a precious metal symbolizing rarity and prestige. Much like the meticulous process of panning for 
-                    gold in the mines, Au by Axsym is dedicated to uncovering and cultivating exceptional, undiscovered 
-                    talent.
-                </p>
-            </div>
-        </div>
+    <div>
+      <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#contact">Contact</a>
+      <a href="#" class="nav-btn">Sign Up</a>
     </div>
+  </nav>
 
-    <!-- Pricing Page -->
-    <div class="page" id="pricing">
-        <div class="container">
-            <div class="particles"></div>
-            <div class="placeholder-content">
-                <h1 class="page-title">Pricing</h1>
-                <p id="quote-text" class="page-description"></p>
-
-                <div class="pricing-table">
-                    <div class="pricing-tier">
-                        <h3>Free</h3>
-                        <p>$0.00/month</p>
-                        <p>🔎 Up to 50 candidate searches per month</p>
-                        <p>👀 1000 profile views and 50 blind offers</p>
-                        <p>✅ Perfect for startups</p>
-                        <button>Select Plan</button>
-                    </div>
-
-                    <div class="pricing-tier">
-                        <h3>Pro</h3>
-                        <p>$200/month</p>
-                        <p>🔎 Up to 300 searches per month</p>
-                        <p>👀 Up to 10,000 profile views and 500 blind offers</p>
-                        <p>✅ Perfect for mid-sized companies</p>
-                        <button>Select Plan</button>
-                    </div>
-
-                    <div class="pricing-tier">
-                        <h3>Enterprise</h3>
-                        <p>$1,000/month</p>
-                        <p>🔎 Unlimited searches</p>
-                        <p>👀 Up to 50,000 profile views and blind offers</p>
-                        <p>✅ Perfect for large companies</p>
-                        <button>Select Plan</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <!-- Slider -->
+  <div class="slider">
+    <div class="slide" style="background-image: url('\ bg1.jpg')">
+      <div class="slide-content">
+        <h1>Revolutionize Hiring</h1>
+        <p>Find Ontario’s top talent anonymously with TalentFlow.</p>
+        <button onclick="window.location.href='#pricing'">Get Started</button>
+      </div>
     </div>
-
-    <!-- Login Page -->
-    <div class="page" id="login">
-        <div class="container">
-            <div class="particles"></div>
-            <div class="placeholder-content">
-                <h1 class="page-title">Login</h1>
-                <p class="page-description">
-                </p>
-                <div class="coming-soon">Coming Soon...</div>
-            </div>
-        </div>
+    <div class="slide" style="background-image: url('\ bg2.jpg')">
+      <div class="slide-content">
+        <h1>Anonymous Talent Search</h1>
+        <p>Filter by skills, certifications, and more without bias.</p>
+        <button onclick="window.location.href='#pricing'">Explore Now</button>
+      </div>
     </div>
+    <div class="slide" style="background-image: url('\ bg3.jpg')">
+      <div class="slide-content">
+        <h1>Hire Smarter, Hire Fair</h1>
+        <p>Send direct offers and streamline your recruitment.</p>
+        <button onclick="window.location.href='#pricing'">Start Hiring</button>
+      </div>
+    </div>
+  </div>
 
-    <script>
-        const hashExamples = [
-            "a3f7b2c8d4e1",
-            "7e9f1a2b5c8d",
-            "c4d8e2f6a9b3",
-            "9b5f3e7a1d4c",
-            "f2a6b9c3d7e1",
-            "6e1c4f8a2b5d",
-            "d7b3f9e2a6c4",
-            "5a9d2f6b4e8c",
-            "8c3f7a9b2d5e",
-            "b6e4a8c1f3d9",
-            "1d9f5b3c7a2e",
-            "4f7c9a5e8b1d",
-            "e2b6d4f9c3a8",
-            "3c8f2d6a9b5e",
-            "9a4e7c2f6b8d",
-            "f6d3a9c5e2b7",
-            "2e8c4f7a3d9b",
-            "7b9f6e2a4c8d",
-            "c1a5f9b7e3d6",
-            "5f2d8c6a9b4e"
-        ];
+  <!-- Gold Flecks -->
+  <div class="gold-flecks"></div>
 
-        const infoQuotes = [
-            "Imagine hiring purely on talent, no preconceptions—our platform makes that real.",
-            "Stop waiting for applications—get the best talent before they even apply.",
-            "Try it free, scale affordably—only pay for the candidates you want.",
-            "Your dream hire is already in our system—you just haven’t met them yet."
-        ];
-        // Function to get a random quote from the array
-        function getRandomQuote() {
-            const randomIndex = Math.floor(Math.random() * infoQuotes.length);
-            return infoQuotes[randomIndex];
-        }
+  <!-- Features Section -->
+  <section id="features">
+    <h2>Why TalentFlow?</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <h3>Anonymous Profiles</h3>
+        <p>Screen candidates by skills, certifications, and interests without bias, compliant with Ontario’s Human Rights Code.</p>
+      </div>
+      <div class="feature-card">
+        <h3>Direct Offers</h3>
+        <p>Send job offers to top matches instantly, letting candidates decide to proceed.</p>
+      </div>
+      <div class="feature-card">
+        <h3>AI-Powered Matching</h3>
+        <p>Leverage AI to find the best talent for your roles, fast and efficiently.</p>
+      </div>
+      <!-- removed AODA for now
+       <div class="feature-card">
+        <h3>AODA Compliant</h3>
+        <p>Built for Ontario’s accessibility and anti-discrimination standards.</p>
+      </div>
+      -->
+    </div>
+  </section>
 
-        // Display the random quote
-        document.getElementById('quote-text').innerText = getRandomQuote();
+  <!-- Pricing Section -->
+  <section id="pricing">
+    <h2>Pricing Plans</h2>
+    <!-- removed subtext
+     <p>For detailed pricing, visit <a href="https://x.ai/grok" style="color: #d4af37;">x.ai/grok</a>.</p>
+  -->
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <h3>Starter</h3>
+        <p style="font-size: 2rem; color: #d4af37;">Free</p>
+        <ul>
+          <li>10 filtered searches</li>
+          <li>500 profile views</li>
+          <li>5 blind offers</li>
+        </ul>
+        <button onclick="window.location.href='#contact'">Select</button>
+      </div>
+      <div class="pricing-card">
+        <h3>Professional</h3>
+        <p style="font-size: 2rem; color: #d4af37;">$99/month</p>
+        <ul>
+          <li>Unlimited filtered searches</li>
+          <li>10,000 profile views</li>
+          <li>50 blind offers</li>
+        </ul>
+        <button onclick="window.location.href='#contact'">Select</button>
+      </div>
+      <div class="pricing-card">
+        <h3>Enterprise</h3>
+        <p style="font-size: 2rem; color: #d4af37;">$999/month</p>
+        <ul>
+          <li>Unlimited searches & postings</li>
+          <li>Unlimited profile views</li>
+          <li>5,000 blind offers</li>
+        </ul>
+        <button onclick="window.location.href='#contact'">Select</button>
+      </div>
+      <!-- removed pay per offer
+       <div class="pricing-card">
+        <h3>Pay-Per-Offer</h3>
+        <p style="font-size: 2rem; color: #d4af37;">$5/offer sent</p>
+        <ul>
+          <li>Pay only for offers sent, up to $5000</li>
+          <li>Access to all filters</li>
+          <li>No monthly commitment</li>
+          <li>Ideal for small businesses</li>
+        </ul>
+        <button onclick="window.location.href='#contact'">Select</button>
+      </div> -->
+    </div>
+  </section>
 
-        // New quote every 5 seconds
-        setInterval(() => {
-            document.getElementById('quote-text').innerText = getRandomQuote();
-        }, 5000);
+  <!-- Contact Section -->
+  <section id="contact">
+    <h2>Get in Touch</h2>
+    <p>Have questions? Contact us to learn how TalentFlow can transform your hiring process in Ontario.</p>
+    <button style="background-color: #d4af37; color: #1a1a1a; padding: 1rem 2rem; border-radius: 5px; border: none; cursor: pointer;" onmouseover="this.style.backgroundColor='#ffd700'" onmouseout="this.style.backgroundColor='#d4af37'">Contact Us</button>
+  </section>
 
-        // Navigation functionality
-        function showPage(pageId) {
-            // Hide all pages
-            const pages = document.querySelectorAll('.page');
-            pages.forEach(page => page.classList.remove('active'));
-            
-            // Remove active class from all nav links
-            const navLinks = document.querySelectorAll('.nav-link');
-            navLinks.forEach(link => link.classList.remove('active'));
-            
-            // Show selected page
-            document.getElementById(pageId).classList.add('active');
-            
-            // Add active class to clicked nav link
-            event.target.classList.add('active');
-            
-            // Restart animations for home page
-            if (pageId === 'home') {
-                restartHomeAnimations();
-            }
-            
-            // Create sparkle particles for all pages
-            createSparkleParticles();
-        }
+  <!-- Footer -->
+  <footer>
+    <p>© 2025 TalentFlow. All rights reserved. | Compliant with Ontario’s AODA and Human Rights Code.</p>
+  </footer>
 
-        function restartHomeAnimations() {
-            // Clear existing hash numbers
-            const existingHashes = document.querySelectorAll('.hash-number');
-            existingHashes.forEach(hash => hash.remove());
-            
-            // Reset text container
-            const textContainer = document.getElementById('textContainer');
-            textContainer.classList.remove('show');
-            
-            // Reset golden numbers
-            const goldenNumbers = document.getElementById('goldenNumbers');
-            goldenNumbers.classList.remove('show');
-            
-            // Reset selected hashes array
-            selectedHashes = [];
-            
-            // Start animations after a brief delay
-            setTimeout(() => {
-                generateHashNumbers();
-            }, 100);
-        }
+  <script>
+    // Slider Functionality
+    const slides = document.querySelectorAll('.slide');
+    let currentSlide = 0;
 
-        function generateHashNumbers() {
-            const container = document.querySelector('#home .container');
-            
-            // Create multiple clusters of falling numbers
-            for (let cluster = 0; cluster < 5; cluster++) {
-                setTimeout(() => {
-                    for (let i = 0; i < 15; i++) {
-                        setTimeout(() => {
-                            const hashElement = document.createElement('div');
-                            hashElement.className = 'hash-number';
-                            hashElement.textContent = hashExamples[Math.floor(Math.random() * hashExamples.length)];
-                            
-                            // Random starting position across the width
-                            const startX = Math.random() * window.innerWidth;
-                            hashElement.style.left = startX + 'px';
-                            hashElement.style.top = '-50px';
-                            
-                            container.appendChild(hashElement);
-                            
-                            // Animate falling
-                            animateHash(hashElement, startX);
-                        }, i * 100);
-                    }
-                }, cluster * 300);
-            }
-        }
+    function showSlide(index) {
+      slides.forEach((slide, i) => {
+        slide.classList.toggle('active', i === index);
+      });
+    }
 
-        function animateHash(element, startX) {
-            let currentY = -50;
-            const fallSpeed = 2 + Math.random() * 3;
-            const sway = (Math.random() - 0.5) * 0.5;
-            let currentX = startX;
-            
-            const fall = () => {
-                currentY += fallSpeed;
-                currentX += sway;
-                
-                element.style.top = currentY + 'px';
-                element.style.left = currentX + 'px';
-                
-                // Check if it's at the midpoint (sifting line)
-                if (currentY >= window.innerHeight * 0.5 && currentY <= window.innerHeight * 0.5 + 50) {
-                    // Most numbers continue falling, only a few stop
-                    if (Math.random() > 0.98) { // Very low chance to stop (golden nugget)
-                        selectAsGoldenHash(element, currentX);
-                        return;
-                    }
-                }
-                
-                // Continue falling if not selected
-                if (currentY < window.innerHeight + 100) {
-                    requestAnimationFrame(fall);
-                } else {
-                    element.remove();
-                }
-            };
-            
-            requestAnimationFrame(fall);
-        }
+    function nextSlide() {
+      currentSlide = (currentSlide + 1) % slides.length;
+      showSlide(currentSlide);
+    }
 
-        let selectedHashes = [];
-        
-        function selectAsGoldenHash(element, x) {
-            if (selectedHashes.length < 3) {
-                element.classList.add('golden-hash');
-                element.style.position = 'fixed';
-                element.style.top = window.innerHeight * 0.5 + 'px';
-                
-                selectedHashes.push(element);
-                
-                // Position them nicely around the center
-                if (selectedHashes.length === 3) {
-                    positionGoldenHashes();
-                }
-            } else {
-                // If we already have 3, this one continues falling
-                let currentY = parseFloat(element.style.top);
-                const continueFall = () => {
-                    currentY += 3;
-                    element.style.top = currentY + 'px';
-                    if (currentY < window.innerHeight + 100) {
-                        requestAnimationFrame(continueFall);
-                    } else {
-                        element.remove();
-                    }
-                };
-                requestAnimationFrame(continueFall);
-            }
-        }
+    showSlide(currentSlide);
+    setInterval(nextSlide, 5000);
 
-        function positionGoldenHashes() {
-            const centerX = window.innerWidth / 2;
-            const centerY = window.innerHeight / 2;
-            
-            selectedHashes.forEach((hash, index) => {
-                const angle = (index * 120 - 60) * Math.PI / 180; // 120 degrees apart, starting from left
-                const radius = 200;
-                const x = centerX + Math.cos(angle) * radius;
-                const y = centerY + Math.sin(angle) * 50;
-                
-                hash.style.left = x + 'px';
-                hash.style.top = y + 'px';
-                hash.style.transition = 'all 1s ease-out';
-            });
-            
-            // Show text after positioning
-            setTimeout(() => {
-                showText();
-                document.getElementById('goldenNumbers').classList.add('show');
-            }, 1500);
-        }
-
-        function showText() {
-            const textContainer = document.getElementById('textContainer');
-            textContainer.classList.add('show');
-        }
-
-        function createSparkleParticles() {
-            const activePageParticles = document.querySelector('.page.active .particles');
-            if (!activePageParticles) return;
-            
-            // Clear existing particles
-            activePageParticles.innerHTML = '';
-            
-            const particleInterval = setInterval(() => {
-                // Stop creating particles if this page is no longer active
-                if (!activePageParticles.closest('.page').classList.contains('active')) {
-                    clearInterval(particleInterval);
-                    return;
-                }
-                
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                particle.style.left = Math.random() * window.innerWidth + 'px';
-                particle.style.top = Math.random() * window.innerHeight + 'px';
-                particle.style.animationDelay = Math.random() * 3 + 's';
-                
-                activePageParticles.appendChild(particle);
-                
-                setTimeout(() => {
-                    particle.remove();
-                }, 3000);
-            }, 200);
-        }
-
-        // Start the animation sequence
-        window.addEventListener('load', () => {
-            generateHashNumbers();
-            createSparkleParticles();
-        });
-    </script>
+    // Gold Flecks Animation
+    const flecksContainer = document.querySelector('.gold-flecks');
+    for (let i = 0; i < 50; i++) {
+      const fleck = document.createElement('div');
+      fleck.classList.add('fleck');
+      fleck.style.left = `${Math.random() * 100}vw`;
+      fleck.style.top = `${Math.random() * 100}vh`;
+      fleck.style.animationDelay = `${Math.random() * 3}s`;
+      flecksContainer.appendChild(fleck);
+    }
+  </script>
 </body>
 </html>
