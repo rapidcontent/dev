@@ -1,0 +1,474 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloverfield</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(0, 100, 0, 0.8);
+            padding: 15px 30px;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .navbar .logo::after {
+            content: '🍀';
+            font-size: 16px;
+            position: relative;
+            top: -5px;
+            left: 5px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 16px;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #90EE90;
+        }
+
+        /* Video Background */
+        .video-container {
+            position: relative;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .video-container video {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            transform: translate(-50%, -50%);
+            object-fit: cover;
+        }
+
+        .hero-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .hero-content h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .hero-content p {
+            font-size: 24px;
+            margin-bottom: 30px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        .cta-button {
+            background: #228B22;
+            color: #fff;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 18px;
+            transition: background 0.3s;
+        }
+
+        .cta-button:hover {
+            background: #90EE90;
+            color: #000;
+        }
+
+        /* Hidden Four-Leaf Clover */
+        .four-leaf-clover {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            font-size: 24px;
+            opacity: 0.2;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        .four-leaf-clover:hover {
+            opacity: 1;
+        }
+
+        /* Pricing Page */
+        .pricing-container {
+            min-height: 100vh;
+            background: #fff;
+            color: #000;
+            padding: 100px 30px;
+            text-align: center;
+        }
+
+        .pricing-container h2 {
+            font-size: 36px;
+            margin-bottom: 40px;
+            color: #006400;
+        }
+
+        .slider-container {
+            max-width: 600px;
+            margin: 0 auto 60px;
+        }
+
+        .slider {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .slider-value {
+            font-size: 24px;
+            color: #006400;
+        }
+
+        .feedback-message {
+            font-size: 18px;
+            color: #228B22;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .pricing-tiers {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .tier {
+            background: #f5f5f5;
+            border: 2px solid #006400;
+            border-radius: 10px;
+            padding: 30px;
+            width: 300px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .tier:hover {
+            transform: translateY(-10px);
+        }
+
+        .tier.highlighted {
+            box-shadow: 0 0 20px rgba(34, 139, 34, 0.5);
+            transform: scale(1.05);
+        }
+
+        .tier h3 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #006400;
+        }
+
+        .tier p {
+            font-size: 16px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .tier .price {
+            font-size: 28px;
+            font-weight: bold;
+            color: #006400;
+            margin-bottom: 20px;
+        }
+
+        .tier .cta-button {
+            display: inline-block;
+            width: 100%;
+        }
+
+        /* How It Works Page */
+
+
+        .typewriter p {
+            font-size: 24px;
+            margin: 10px 0;
+            opacity: 0;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        .typing {
+            opacity: 1;
+            animation: blink-cursor 0.75s step-end infinite;
+        }
+        @keyframes blink-cursor {
+            50% { border-right: 2px solid #333; }
+        }
+        
+        .how-it-works-container {
+            min-height: 100vh;
+            background: #fff;
+            color: #000;
+            padding: 100px 30px;
+            text-align: center;
+        }
+
+        .how-it-works-container h2 {
+            font-size: 36px;
+            color: #006400;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero-content h1 {
+                font-size: 32px;
+            }
+
+            .hero-content p {
+                font-size: 18px;
+            }
+
+            .pricing-tiers {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .tier {
+                width: 100%;
+                max-width: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="#" class="logo">Cloverfield</a>
+        <div class="nav-links">
+            <a href="#home">Home</a>
+            <a href="#how-it-works">How it works</a>
+            <a href="#pricing">Pricing</a>
+        </div>
+    </nav>
+
+    <section id="home" class="video-container">
+        <video autoplay muted loop>
+            <source src="mixkit-small-green-plants-cover-the-forest-ground-50859-full-hd.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <div class="hero-content">
+            <h1>Welcome to Cloverfield</h1>
+            <p>Discover your path to success with our innovative solutions</p>
+            <a href="#how-it-works" class="cta-button">Get Started</a>
+        </div>
+    </section>
+
+    <section id="how-it-works" class="video-container">
+        <video autoplay muted loop>
+            <source src="mixkit-using-a-tablet-at-an-airport-21738-hd-ready.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <div class="hero-content">
+            <h1>How It Works</h1><p></p>
+            <div class="typewriter">
+                <p id="text1">Create a filter.</p>
+                <p id="text2">Discover and view profiles that match.</p>
+                <p id="text3">Send offers and hire the perfect candidate.</p>
+        </div>
+        </div>
+    </section>
+
+    <!--
+    <section id="how-it-works" class="how-it-works-container">
+        <h2>How It Works</h2>
+        <span class="four-leaf-clover" title="You found a hidden clover! Use code 'FOURLEAF' for a free search!">🍀</span>
+    </section>
+    -->
+    
+
+    <section id="pricing" class="pricing-container">
+        <h2>Pricing Plans</h2>
+    </br>
+        <div class="slider-container">
+            <input type="range" min="0" max="50" value="20" class="slider" id="priceSlider">
+            <div class="slider-value">I plan to send <span id="sliderValue">11</span> offers.</div>
+            <div class="feedback-message" id="feedbackMessage">Above 40 offers are pay-per-offer</div>
+        </div>
+        <div class="pricing-tiers">
+            <div class="tier" id="starterTier">
+                <h3>Starter</h3>
+                <p class="price">$99/month</p>
+                <p>Up to 50 profile views</p>
+                <p>Up To 5 Offers</p>
+                <p>Unlimited Filters</p>
+                <a href="#" class="cta-button">Choose Starter</a>
+            </div>
+            <div class="tier" id="proTier">
+                <h3>Pro</h3>
+                <p class="price">$299/month</p>
+                <p>Up to 250 profile views</p>
+                <p>Up to 10 offers</p>
+                <p>Unlimited Filters</p>
+                <a href="#" class="cta-button">Choose Pro</a>
+            </div>
+            <div class="tier" id="enterpriseTier">
+                <h3>Enterprise</h3>
+                <p class="price">$799/month</p>
+                <p>Up to 500 profile views</p>
+                <p>Up to 40 offers</p>
+                <p>Unlimited Filters</p>
+                <a href="#" class="cta-button">Choose Enterprise</a>
+            </div>
+        </div>
+        <span class="four-leaf-clover" title="Lucky Find!">🍀</span>
+    </section>
+
+    <script>
+        const slider = document.getElementById('priceSlider');
+        const sliderValue = document.getElementById('sliderValue');
+        const feedbackMessage = document.getElementById('feedbackMessage');
+        const starterTier = document.getElementById('starterTier');
+        const proTier = document.getElementById('proTier');
+        const enterpriseTier = document.getElementById('enterpriseTier');
+
+        slider.addEventListener('input', () => {
+            const value = parseInt(slider.value);
+            sliderValue.textContent = value;
+
+            // Reset highlights
+            starterTier.classList.remove('highlighted');
+            proTier.classList.remove('highlighted');
+            enterpriseTier.classList.remove('highlighted');
+            feedbackMessage.style.display = 'none';
+
+            // Highlight appropriate tier
+            if (value <= 10) {
+                starterTier.classList.add('highlighted');
+            } else if (value <= 20) {
+                proTier.classList.add('highlighted');
+            } else {
+                enterpriseTier.classList.add('highlighted');
+                if (value > 40) {
+                    feedbackMessage.style.display = 'block';
+                }
+            }
+        });
+
+        // Trigger initial slider update
+        slider.dispatchEvent(new Event('input'));
+
+        // Smooth scrolling for navigation
+        document.querySelectorAll('.nav-links a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                window.scrollTo({
+                    top: targetElement.offsetTop - 70,
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+         function typeWriter(element, text, speed, callback) {
+            let i = 0;
+            element.style.opacity = 1;
+            element.textContent = '';
+            element.classList.add('typing');
+            
+            function type() {
+                if (i < text.length) {
+                    element.textContent += text[i];
+                    i++;
+                    setTimeout(type, speed);
+                } else {
+                    element.classList.remove('typing');
+                    if (callback) callback();
+                }
+            }
+            type();
+        }
+
+        const text1 = document.getElementById('text1');
+        const text2 = document.getElementById('text2');
+        const text3 = document.getElementById('text3');
+
+        function startTyping() {
+            typeWriter(text1, 'Create a filter.', 100, () => {
+                typeWriter(text2, 'Discover and view profiles that match.', 100, () => {
+                    typeWriter(text3, 'Send offers and hire the perfect candidate.', 100);
+                });
+            });
+        }
+
+        window.onload = startTyping;
+    </script>
+</body>
+</html>
